@@ -49,6 +49,8 @@ class _uxState extends State<ux> {
   String dropDownSelectionGender = 'random',
       dropDownSelectionNations = 'random',
       dropDownSelectionPassword = 'strong';
+  final circleAvatarKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -245,9 +247,10 @@ class _uxState extends State<ux> {
                             child: Container(
                               decoration: const BoxDecoration(
                                   color: Colors.black, shape: BoxShape.circle),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.more_vert,
                                 color: Colors.white,
+                                //    size: MediaQuery.of(context).size.width / 8,
                               ),
                             ),
                           )),
@@ -260,6 +263,7 @@ class _uxState extends State<ux> {
                                 radius: MediaQuery.of(context).size.height / 9,
                                 backgroundColor: Colors.black,
                                 child: CircleAvatar(
+                                  key: circleAvatarKey,
                                   radius:
                                       MediaQuery.of(context).size.height / 10,
                                   foregroundImage: NetworkImage(
@@ -268,7 +272,21 @@ class _uxState extends State<ux> {
                               ),
                             ),
                           ),
-                          const Expanded(child: Icon(Icons.star))
+                          Expanded(
+                              child: GestureDetector(
+                            onTap: () {
+                              Scaffold.of(context).openDrawer();
+                            },
+                            child: Container(
+                              //    padding: EdgeInsets.all(10),
+                              decoration: const BoxDecoration(
+                                  color: Colors.black, shape: BoxShape.circle),
+                              child: const Icon(
+                                Icons.stars_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )),
                         ],
                       ),
                     ),
