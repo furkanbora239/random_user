@@ -89,8 +89,6 @@ class _uxState extends State<ux> {
                           dropDownSelectionGender = newValue!;
                           context.read<urlChecker>().urlUpdater[0] = newValue;
                           context.read<urlChecker>().urlUpdete();
-                          print(context.read<urlChecker>().urlUpdater[0]);
-                          print(context.read<urlChecker>().url);
                         });
                       })),
                 )
@@ -122,6 +120,8 @@ class _uxState extends State<ux> {
                       onChanged: ((String? newValue) {
                         setState(() {
                           dropDownSelectionNations = newValue!;
+                          context.read<urlChecker>().urlUpdater[1] = newValue;
+                          context.read<urlChecker>().urlUpdete();
                         });
                       })),
                 )
@@ -160,8 +160,6 @@ class _uxState extends State<ux> {
                           dropDownSelectionPassword = newValue!;
                           context.read<urlChecker>().urlUpdater[2] = newValue;
                           context.read<urlChecker>().urlUpdete();
-                          print(context.read<urlChecker>().urlUpdater[2]);
-                          print(context.read<urlChecker>().url);
                         });
                       })),
                 )
@@ -197,7 +195,7 @@ class _uxState extends State<ux> {
           }),
       body: SafeArea(
           child: FutureBuilder<RandomUser>(
-        future: getData(),
+        future: getData(context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             String firstName = '${snapshot.data!.results!.first!.name!.first}',

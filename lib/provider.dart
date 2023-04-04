@@ -41,32 +41,42 @@ class urlChecker with ChangeNotifier {
   List<String> get urlUpdater => _urlUpdater;
 
   String get url => _url;
-  String forUrlGender = '';
 
   void urlUpdete() {
     String tempUrl = 'https://randomuser.me/api/?';
-    String forPassword = 'password=special,upper,lower,number,8-14';
+    String forPassword = '', forNation = '', forGender = '';
     if (_urlUpdater[2] != 'strong') {
       if (_urlUpdater[2] == 'medium') {
-        tempUrl += 'password=upper,lower,number,8-14';
+        forPassword = 'password=upper,lower,number,8-14';
       } else if (_urlUpdater[2] == 'weak') {
-        tempUrl += 'password=upper,lower,8-14';
+        forPassword = 'password=upper,lower,8-14';
       } else {
-        tempUrl += 'password=special,upper,lower,number,8-14';
+        forPassword = 'password=special,upper,lower,number,8-14';
       }
+    } else {
+      forPassword = 'password=special,upper,lower,number,8-14';
     }
 
     if (_urlUpdater[0] != 'random') {
       if (_urlUpdater[0] == 'female') {
-        forUrlGender = '&gender=female';
+        forGender = '&gender=female';
       } else if (_urlUpdater[0] == 'male') {
-        _url += _urlUpdater[0];
+        forGender = '&gender=male';
       } else {
-        forUrlGender = '';
+        forGender = '';
       }
+    } else {
+      forGender = '';
     }
 
-    if (_urlUpdater[1] != 'random') {}
+    if (_urlUpdater[1] == 'random') {
+      forNation = '';
+    } else {
+      forNation = '&nat=${_urlUpdater[1].toLowerCase()}';
+    }
+
+    tempUrl = 'https://randomuser.me/api/?$forPassword$forGender$forNation';
+
     _url = tempUrl;
     notifyListeners();
   }
