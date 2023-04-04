@@ -9,7 +9,7 @@ import 'package:random_user/service.dart';
 
 void main() {
   runApp(MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => getUser())],
+      providers: [ChangeNotifierProvider(create: (_) => urlChecker())],
       child: const MyApp()));
 }
 
@@ -46,9 +46,141 @@ class ux extends StatefulWidget {
 }
 
 class _uxState extends State<ux> {
+  String dropDownSelectionGender = 'random',
+      dropDownSelectionNations = 'random',
+      dropDownSelectionPassword = 'strong';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: SafeArea(
+            child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Expanded(
+                    child: Text(
+                  'Gander',
+                  textAlign: TextAlign.right,
+                )),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: DropdownButton<String>(
+                      value: dropDownSelectionGender,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'random',
+                          child: Text('Random'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'female',
+                          child: Text('Female'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'male',
+                          child: Text('Male'),
+                        ),
+                      ],
+                      onChanged: ((String? newValue) {
+                        setState(() {
+                          dropDownSelectionGender = newValue!;
+                          context.read<urlChecker>().urlUpdater[0] = newValue;
+                          context.read<urlChecker>().urlUpdete();
+                          print(context.read<urlChecker>().urlUpdater[0]);
+                          print(context.read<urlChecker>().url);
+                        });
+                      })),
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Expanded(
+                    child: Text(
+                  'Nations',
+                  textAlign: TextAlign.right,
+                )),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: DropdownButton<String>(
+                      value: dropDownSelectionNations,
+                      items: context
+                          .read<urlChecker>()
+                          .nation
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: ((String? newValue) {
+                        setState(() {
+                          dropDownSelectionNations = newValue!;
+                        });
+                      })),
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Expanded(
+                    child: Text(
+                  'Password',
+                  textAlign: TextAlign.right,
+                )),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: DropdownButton<String>(
+                      value: dropDownSelectionPassword,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'strong',
+                          child: Text('Strong'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'medium',
+                          child: Text('Medium'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'weak',
+                          child: Text('Weak'),
+                        ),
+                      ],
+                      onChanged: ((String? newValue) {
+                        setState(() {
+                          dropDownSelectionPassword = newValue!;
+                          context.read<urlChecker>().urlUpdater[2] = newValue;
+                          context.read<urlChecker>().urlUpdete();
+                          print(context.read<urlChecker>().urlUpdater[2]);
+                          print(context.read<urlChecker>().url);
+                        });
+                      })),
+                )
+              ],
+            ),
+            const Expanded(child: SizedBox()),
+            //const SizedBox.expand()
+            TextButton(
+                onPressed: () {
+                  const Duration(milliseconds: 100);
+                  showAboutDialog(
+                    context: context,
+                    applicationName: 'Random User',
+                  );
+                },
+                child: const Text('More Info')),
+          ],
+        )),
+      ),
       floatingActionButton: FloatingActionButton(
           // yenileme buttonu
           tooltip: 'refresh',
@@ -57,8 +189,12 @@ class _uxState extends State<ux> {
             Icons.refresh_rounded,
           )),
           onPressed: () {
-            setState(() {});
-          }), // tuşa basılınca ne olacak
+            setState(() {
+              /*  içerisinde bir fonksiyon olmasada 
+            düymeye basıldığında widget genilendiği yani setstate edildiği için 
+            card yinede yenileniyor  */
+            });
+          }),
       body: SafeArea(
           child: FutureBuilder<RandomUser>(
         future: getData(),
@@ -66,7 +202,7 @@ class _uxState extends State<ux> {
           if (snapshot.hasData) {
             String firstName = '${snapshot.data!.results!.first!.name!.first}',
                 lestName = '${snapshot.data!.results!.first!.name!.last}',
-                cellPhoneNumber = '${snapshot.data!.results!.first!.cell}',
+                cellPhoneNumber = '${snapshot.data!.results!.first!.phone}',
                 email = '${snapshot.data!.results!.first!.email}',
                 userName = '${snapshot.data!.results!.first!.login!.username}',
                 password = '${snapshot.data!.results!.first!.login!.password}',
@@ -91,15 +227,34 @@ class _uxState extends State<ux> {
                     //    <===== top container
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Container(
+                      margin: const EdgeInsets.only(bottom: 1),
                       decoration: BoxDecoration(
                           //backgroundBlendMode: BlendMode.clear, ====>gradien istiyormuş halledersin bir ara
-                          border: Border.all(color: Colors.black, width: 0),
+                          //color: Colors.black,
+                          border: Border.all(color: Colors.black, width: 1),
                           borderRadius: const BorderRadius.only(
                               bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10))),
+                              bottomRight: Radius.circular(10),
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4))),
                       child: Row(
                         children: [
                           Expanded(
+                              child: GestureDetector(
+                            onTap: () {
+                              Scaffold.of(context).openDrawer();
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                  color: Colors.black, shape: BoxShape.circle),
+                              child: const Icon(
+                                Icons.more_vert,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )),
+                          Expanded(
+                            flex: 2,
                             child: Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 15.0),
@@ -115,13 +270,13 @@ class _uxState extends State<ux> {
                               ),
                             ),
                           ),
+                          const Expanded(child: Icon(Icons.star))
                         ],
                       ),
                     ),
                   ),
                   //random userın adı ve soy adı yazacak
                   Expanded(
-                    //height: 300,
                     child: ListView(
                       children: [
                         Row(
@@ -154,6 +309,7 @@ class _uxState extends State<ux> {
                                     hadder: 'City', content: city)),
                           ],
                         ),
+                        BoxLikeGoogleUi(hadder: 'State', content: state),
                         Row(
                           children: [
                             Expanded(
@@ -164,9 +320,9 @@ class _uxState extends State<ux> {
                             ),
                             Expanded(
                                 child: BoxLikeGoogleUi(
-                                    hadder: 'Post Code', content: postCode))
+                                    hadder: 'Post Code', content: postCode)),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
