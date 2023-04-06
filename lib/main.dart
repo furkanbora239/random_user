@@ -3,14 +3,19 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:random_user/componends/Drawer.dart';
+import 'package:random_user/componends/endDrawe.dart';
 import 'package:random_user/model.dart';
 import 'package:random_user/provider.dart';
 import 'package:random_user/service.dart';
 
+import 'componends/googleLikeBox.dart';
+
 void main() {
-  runApp(MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => urlChecker())],
-      child: const MyApp()));
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => urlChecker()),
+    ChangeNotifierProvider(create: (_) => UserList())
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -31,7 +36,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.yellow,
       ),
       home: const ux(),
     );
@@ -46,141 +51,23 @@ class ux extends StatefulWidget {
 }
 
 class _uxState extends State<ux> {
-  String dropDownSelectionGender = 'random',
-      dropDownSelectionNations = 'random',
-      dropDownSelectionPassword = 'strong';
-  final circleAvatarKey = GlobalKey();
+  @override
+  void initState() {
+    // TODO: implement initState
+    context.read<UserList>().checkCounter();
+
+    context.read<UserList>().getFavUser();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final ValueNotifier<bool> isItPress = ValueNotifier(false);
     return Scaffold(
-      drawer: Drawer(
-        child: SafeArea(
-            child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Expanded(
-                    child: Text(
-                  'Gander',
-                  textAlign: TextAlign.right,
-                )),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: DropdownButton<String>(
-                      value: dropDownSelectionGender,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'random',
-                          child: Text('Random'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'female',
-                          child: Text('Female'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'male',
-                          child: Text('Male'),
-                        ),
-                      ],
-                      onChanged: ((String? newValue) {
-                        setState(() {
-                          dropDownSelectionGender = newValue!;
-                          context.read<urlChecker>().urlUpdater[0] = newValue;
-                          context.read<urlChecker>().urlUpdete();
-                        });
-                      })),
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Expanded(
-                    child: Text(
-                  'Nations',
-                  textAlign: TextAlign.right,
-                )),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: DropdownButton<String>(
-                      value: dropDownSelectionNations,
-                      items: context
-                          .read<urlChecker>()
-                          .nation
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: ((String? newValue) {
-                        setState(() {
-                          dropDownSelectionNations = newValue!;
-                          context.read<urlChecker>().urlUpdater[1] = newValue;
-                          context.read<urlChecker>().urlUpdete();
-                        });
-                      })),
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Expanded(
-                    child: Text(
-                  'Password',
-                  textAlign: TextAlign.right,
-                )),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: DropdownButton<String>(
-                      value: dropDownSelectionPassword,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'strong',
-                          child: Text('Strong'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'medium',
-                          child: Text('Medium'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'weak',
-                          child: Text('Weak'),
-                        ),
-                      ],
-                      onChanged: ((String? newValue) {
-                        setState(() {
-                          dropDownSelectionPassword = newValue!;
-                          context.read<urlChecker>().urlUpdater[2] = newValue;
-                          context.read<urlChecker>().urlUpdete();
-                        });
-                      })),
-                )
-              ],
-            ),
-            const Expanded(child: SizedBox()),
-            //const SizedBox.expand()
-            TextButton(
-                onPressed: () {
-                  const Duration(milliseconds: 100);
-                  showAboutDialog(
-                    context: context,
-                    applicationName: 'Random User',
-                  );
-                },
-                child: const Text('More Info')),
-          ],
-        )),
-      ),
+      endDrawer: const myEndDrawer(),
+      // left drawer for more info and some flliter
+      drawer: const myDrawer(),
       floatingActionButton: FloatingActionButton(
           // yenileme buttonu
           tooltip: 'refresh',
@@ -200,7 +87,8 @@ class _uxState extends State<ux> {
         future: getData(context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            String firstName = '${snapshot.data!.results!.first!.name!.first}',
+            String pp = '${snapshot.data!.results!.first!.picture!.large}',
+                firstName = '${snapshot.data!.results!.first!.name!.first}',
                 lestName = '${snapshot.data!.results!.first!.name!.last}',
                 cellPhoneNumber = '${snapshot.data!.results!.first!.phone}',
                 email = '${snapshot.data!.results!.first!.email}',
@@ -213,6 +101,21 @@ class _uxState extends State<ux> {
                 country = '${snapshot.data!.results!.first!.location!.country}',
                 postCode =
                     '${snapshot.data!.results!.first!.location!.postcode}';
+
+            List<String> RandomUserData = [
+              pp,
+              firstName,
+              lestName,
+              cellPhoneNumber,
+              email,
+              userName,
+              password,
+              street,
+              city,
+              state,
+              country,
+              postCode
+            ];
 
             return Container(
               margin: const EdgeInsets.all(20),
@@ -247,7 +150,7 @@ class _uxState extends State<ux> {
                             child: Container(
                               decoration: const BoxDecoration(
                                   color: Colors.black, shape: BoxShape.circle),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.more_vert,
                                 color: Colors.white,
                                 //    size: MediaQuery.of(context).size.width / 8,
@@ -263,30 +166,44 @@ class _uxState extends State<ux> {
                                 radius: MediaQuery.of(context).size.height / 9,
                                 backgroundColor: Colors.black,
                                 child: CircleAvatar(
-                                  key: circleAvatarKey,
                                   radius:
                                       MediaQuery.of(context).size.height / 10,
-                                  foregroundImage: NetworkImage(
-                                      '${snapshot.data!.results!.first!.picture!.large}'),
+                                  foregroundImage: NetworkImage(pp),
                                 ),
                               ),
                             ),
                           ),
                           Expanded(
-                              child: GestureDetector(
-                            onTap: () {
-                              Scaffold.of(context).openDrawer();
-                            },
-                            child: Container(
-                              //    padding: EdgeInsets.all(10),
-                              decoration: const BoxDecoration(
-                                  color: Colors.black, shape: BoxShape.circle),
-                              child: const Icon(
-                                Icons.stars_rounded,
-                                color: Colors.white,
-                              ),
-                            ),
-                          )),
+                            child: ValueListenableBuilder<bool>(
+                                valueListenable: isItPress,
+                                builder: (context, val, child) {
+                                  return GestureDetector(
+                                    onLongPress: () {
+                                      Scaffold.of(context).openEndDrawer();
+                                    },
+                                    onTap: () {
+                                      isItPress.value = !isItPress.value;
+                                      context
+                                          .read<UserList>()
+                                          .FavList
+                                          .add(RandomUserData);
+                                      context.read<UserList>().addFavUser();
+                                    },
+                                    child: Container(
+                                      //    padding: EdgeInsets.all(10),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.black,
+                                          shape: BoxShape.circle),
+                                      child: Icon(
+                                        Icons.star_rounded,
+                                        color: isItPress.value == true
+                                            ? Colors.yellow
+                                            : Colors.white,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ),
                         ],
                       ),
                     ),
@@ -351,61 +268,6 @@ class _uxState extends State<ux> {
           return const Center(child: CircularProgressIndicator());
         },
       )),
-    );
-  }
-}
-
-//    its a widgt for google like container
-class BoxLikeGoogleUi extends StatefulWidget {
-  final String hadder, content;
-  const BoxLikeGoogleUi(
-      {super.key, required this.hadder, required this.content});
-
-  @override
-  State<BoxLikeGoogleUi> createState() => _BoxLikeGoogleUiState();
-}
-
-class _BoxLikeGoogleUiState extends State<BoxLikeGoogleUi> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Stack(
-        alignment: const Alignment(-0.8, -1.5),
-        children: [
-          Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  border: Border.all(width: 2, color: Colors.black),
-                  borderRadius: BorderRadius.circular(10)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.content,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      await Clipboard.setData(
-                          ClipboardData(text: widget.content));
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          duration: Duration(milliseconds: 300),
-                          content: Text('copied to clipboard')));
-                    },
-                    child: const Icon(Icons.copy),
-                  )
-                ],
-              )),
-          Container(
-            decoration: BoxDecoration(color: Theme.of(context).canvasColor),
-            child: Text(' ${widget.hadder} '),
-          )
-        ],
-      ),
     );
   }
 }
