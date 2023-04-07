@@ -1,4 +1,4 @@
-import 'dart:ffi';
+// ignore_for_file: unused_element, non_constant_identifier_names, camel_case_types
 
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -107,7 +107,6 @@ class UserList with ChangeNotifier {
 
       prefs.setInt('userCounter', userCounter);
 
-      print('from addFavUser userCounter is $userCounter');
       notifyListeners();
     }
   }
@@ -117,29 +116,24 @@ class UserList with ChangeNotifier {
     checkCounter();
 
     for (int index = 0; index < userCounter; index++) {
-      print('form getFavUser index is $index');
       List<dynamic> emty = [];
       for (int i = 0; i < 20; i++) {
         emty.add('null');
       }
       _FavList.add(prefs.getStringList('favUserInfo$index') ?? emty);
     }
-    print('from getFavUser work and user counter is $userCounter');
     notifyListeners();
   }
 
   Future<void> checkCounter() async {
     final prefs = await SharedPreferences.getInstance();
     userCounter = prefs.getInt('userCounter') ?? 0;
-    print(
-        'formProvider userCounter is $userCounter // favList.lang is ${_FavList.length}');
   }
 
   Future<void> deleteOneUser(int UserNumber) async {
     final prefs = await SharedPreferences.getInstance();
     checkCounter();
     _FavList.removeAt(UserNumber);
-    print('delete one user ${_FavList.length}');
 
     for (int index = 0; index < userCounter; index++) {
       if (index < _FavList.length) {
@@ -160,7 +154,6 @@ class UserList with ChangeNotifier {
     _FavList = [];
     for (; userCounter > 0; userCounter--) {
       prefs.remove('favUserInfo$userCounter');
-      print('from delete all $userCounter');
     }
     _FavList = [];
     prefs.remove('userCount');
