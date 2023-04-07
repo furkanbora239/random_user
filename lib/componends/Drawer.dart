@@ -138,9 +138,11 @@ class _myDrawerState extends State<myDrawer> {
               onPressed: () {
                 const Duration(milliseconds: 100);
                 showAboutDialog(
-                  context: context,
-                  applicationName: 'Random User',
-                );
+                    applicationVersion: 'beta',
+                    context: context,
+                    applicationName: 'Random User',
+                    applicationLegalese:
+                        "This application is using the randomuser.me API to generate random users.");
               },
               child: const Text('More Info')),
         ],

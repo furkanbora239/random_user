@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:random_user/componends/seeUserInfo.dart';
 import 'package:random_user/provider.dart';
 
 class myEndDrawer extends StatelessWidget {
@@ -64,6 +65,14 @@ class myEndDrawer extends StatelessWidget {
                                       borderRadius: const BorderRadius.all(
                                           Radius.circular(50))),
                                   child: ListTile(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  seeUserInfoPage(
+                                                      index: index)));
+                                    },
                                     // user delete button here
                                     trailing: PopupMenuButton(
                                         onSelected: (value) {
@@ -92,7 +101,9 @@ class myEndDrawer extends StatelessWidget {
                                             userComponent(index, 0, context))),
                                     title: Text(
                                       '${userComponent(index, 1, context)} ${userComponent(index, 2, context)}',
-                                      style: const TextStyle(color: Colors.red),
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).primaryColor),
                                     ),
                                   ),
                                 );

@@ -4,16 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class BoxLikeGoogleUi extends StatefulWidget {
+class BoxLikeGoogleUi extends StatelessWidget {
   final String hadder, content;
   const BoxLikeGoogleUi(
       {super.key, required this.hadder, required this.content});
 
-  @override
-  State<BoxLikeGoogleUi> createState() => _BoxLikeGoogleUiState();
-}
-
-class _BoxLikeGoogleUiState extends State<BoxLikeGoogleUi> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -31,7 +26,7 @@ class _BoxLikeGoogleUiState extends State<BoxLikeGoogleUi> {
                 children: [
                   Expanded(
                     child: Text(
-                      widget.content,
+                      content,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: const TextStyle(fontWeight: FontWeight.w500),
@@ -39,8 +34,7 @@ class _BoxLikeGoogleUiState extends State<BoxLikeGoogleUi> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      await Clipboard.setData(
-                          ClipboardData(text: widget.content));
+                      await Clipboard.setData(ClipboardData(text: content));
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           duration: Duration(milliseconds: 300),
                           content: Text('copied to clipboard')));
@@ -55,7 +49,7 @@ class _BoxLikeGoogleUiState extends State<BoxLikeGoogleUi> {
           Container(
             decoration: BoxDecoration(color: Theme.of(context).canvasColor),
             child: Text(
-              ' ${widget.hadder} ',
+              ' $hadder ',
               style: TextStyle(
                   fontWeight: FontWeight.w400,
                   color: Colors.black,
