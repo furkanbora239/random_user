@@ -54,6 +54,7 @@ class _uxState extends State<ux> {
   @override
   void initState() {
     // TODO: implement initState
+
     context.read<UserList>().checkCounter();
 
     context.read<UserList>().getFavUser();
@@ -177,20 +178,29 @@ class _uxState extends State<ux> {
                             child: ValueListenableBuilder<bool>(
                                 valueListenable: isItPress,
                                 builder: (context, val, child) {
+                                  // user fav star button is here
                                   return GestureDetector(
                                     onLongPress: () {
                                       Scaffold.of(context).openEndDrawer();
                                     },
                                     onTap: () {
                                       isItPress.value = !isItPress.value;
-                                      context
-                                          .read<UserList>()
-                                          .FavList
-                                          .add(RandomUserData);
-                                      context.read<UserList>().addFavUser();
+                                      if (isItPress.value == true) {
+                                        context
+                                            .read<UserList>()
+                                            .FavList
+                                            .add(RandomUserData);
+                                        context.read<UserList>().addFavUser();
+                                      } else if (isItPress.value == false) {
+                                        context.read<UserList>().deleteOneUser(
+                                            context
+                                                    .read<UserList>()
+                                                    .FavList
+                                                    .length -
+                                                1);
+                                      }
                                     },
                                     child: Container(
-                                      //    padding: EdgeInsets.all(10),
                                       decoration: const BoxDecoration(
                                           color: Colors.black,
                                           shape: BoxShape.circle),

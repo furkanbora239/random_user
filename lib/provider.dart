@@ -85,9 +85,11 @@ class urlChecker with ChangeNotifier {
   }
 }
 
-int userCounter = 0;
-
 class UserList with ChangeNotifier {
+  int userCounter = 0;
+
+  int get _userCounter => userCounter;
+
   List<List> _FavList = [];
 
   List<List> get FavList => _FavList;
@@ -101,10 +103,12 @@ class UserList with ChangeNotifier {
 
       prefs.setStringList(
           'favUserInfo$userCounter', _FavList[userCounter] as List<String>);
-
       userCounter++;
 
       prefs.setInt('userCounter', userCounter);
+
+      print('from addFavUser userCounter is $userCounter');
+      notifyListeners();
     }
   }
 
@@ -114,9 +118,14 @@ class UserList with ChangeNotifier {
 
     for (int index = 0; index < userCounter; index++) {
       print('form getFavUser index is $index');
-      _FavList.add(prefs.getStringList('favUserInfo$index') as List<dynamic>);
+      List<dynamic> emty = [];
+      for (int i = 0; i < 20; i++) {
+        emty.add('null');
+      }
+      _FavList.add(prefs.getStringList('favUserInfo$index') ?? emty);
     }
     print('from getFavUser work and user counter is $userCounter');
+    notifyListeners();
   }
 
   Future<void> checkCounter() async {
@@ -126,6 +135,26 @@ class UserList with ChangeNotifier {
         'formProvider userCounter is $userCounter // favList.lang is ${_FavList.length}');
   }
 
+  Future<void> deleteOneUser(int UserNumber) async {
+    final prefs = await SharedPreferences.getInstance();
+    checkCounter();
+    _FavList.removeAt(UserNumber);
+    print('delete one user ${_FavList.length}');
+
+    for (int index = 0; index < userCounter; index++) {
+      if (index < _FavList.length) {
+        prefs.setStringList(
+            'favUserInfo$index', _FavList[index] as List<String>);
+      } else {
+        prefs.remove('favUserInfo$index');
+      }
+    }
+
+    prefs.setInt('userCounter', _FavList.length);
+
+    notifyListeners();
+  }
+
   Future<void> deleteAll() async {
     final prefs = await SharedPreferences.getInstance();
     _FavList = [];
@@ -133,5 +162,8 @@ class UserList with ChangeNotifier {
       prefs.remove('favUserInfo$userCounter');
       print('from delete all $userCounter');
     }
+    _FavList = [];
+    prefs.remove('userCount');
+    notifyListeners();
   }
 }
