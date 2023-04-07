@@ -191,12 +191,19 @@ class _uxState extends State<ux> {
                                             .add(RandomUserData);
                                         context.read<UserList>().addFavUser();
                                       } else if (isItPress.value == false) {
-                                        context.read<UserList>().deleteOneUser(
+                                        if (RandomUserData ==
                                             context
-                                                    .read<UserList>()
-                                                    .FavList
-                                                    .length -
-                                                1);
+                                                .read<UserList>()
+                                                .FavList
+                                                .last) {
+                                          context
+                                              .read<UserList>()
+                                              .deleteOneUser(context
+                                                      .read<UserList>()
+                                                      .FavList
+                                                      .length -
+                                                  1);
+                                        }
                                       }
                                     },
                                     child: Container(
