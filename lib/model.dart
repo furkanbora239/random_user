@@ -703,6 +703,7 @@ class RandomUser {
     if (results != null) {
       final v = results;
       final arr0 = [];
+      // ignore: avoid_function_literals_in_foreach_calls
       v!.forEach((v) {
         arr0.add(v!.toJson());
       });

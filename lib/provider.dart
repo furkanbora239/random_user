@@ -1,11 +1,12 @@
-import 'dart:ffi';
+// ignore_for_file: camel_case_types, unused_element, non_constant_identifier_names
 
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class urlChecker with ChangeNotifier {
+  int numberOfPeopleToPull = 20;
   String _url =
-      'https://randomuser.me/api/?password=special,upper,lower,number,8-14';
+      'https://randomuser.me/api/?password=special,upper,lower,number,8-14&results=20';
 
   final List<String> _nation = [
     'random',
@@ -46,7 +47,7 @@ class urlChecker with ChangeNotifier {
   String get url => _url;
 
   void urlUpdete() {
-    String tempUrl = 'https://randomuser.me/api/?';
+    String tempUrl = 'https://randomuser.me/api/?results=50&';
     String forPassword = '', forNation = '', forGender = '';
     if (_urlUpdater[2] != 'strong') {
       if (_urlUpdater[2] == 'medium') {
@@ -78,7 +79,8 @@ class urlChecker with ChangeNotifier {
       forNation = '&nat=${_urlUpdater[1].toLowerCase()}';
     }
 
-    tempUrl = 'https://randomuser.me/api/?$forPassword$forGender$forNation';
+    tempUrl =
+        'https://randomuser.me/api/?$forPassword$forGender$forNation&results=20';
 
     _url = tempUrl;
     notifyListeners();
@@ -107,7 +109,6 @@ class UserList with ChangeNotifier {
 
       prefs.setInt('userCounter', userCounter);
 
-      print('from addFavUser userCounter is $userCounter');
       notifyListeners();
     }
   }
@@ -117,29 +118,24 @@ class UserList with ChangeNotifier {
     checkCounter();
 
     for (int index = 0; index < userCounter; index++) {
-      print('form getFavUser index is $index');
       List<dynamic> emty = [];
       for (int i = 0; i < 20; i++) {
         emty.add('null');
       }
       _FavList.add(prefs.getStringList('favUserInfo$index') ?? emty);
     }
-    print('from getFavUser work and user counter is $userCounter');
     notifyListeners();
   }
 
   Future<void> checkCounter() async {
     final prefs = await SharedPreferences.getInstance();
     userCounter = prefs.getInt('userCounter') ?? 0;
-    print(
-        'formProvider userCounter is $userCounter // favList.lang is ${_FavList.length}');
   }
 
   Future<void> deleteOneUser(int UserNumber) async {
     final prefs = await SharedPreferences.getInstance();
     checkCounter();
     _FavList.removeAt(UserNumber);
-    print('delete one user ${_FavList.length}');
 
     for (int index = 0; index < userCounter; index++) {
       if (index < _FavList.length) {
@@ -160,7 +156,6 @@ class UserList with ChangeNotifier {
     _FavList = [];
     for (; userCounter > 0; userCounter--) {
       prefs.remove('favUserInfo$userCounter');
-      print('from delete all $userCounter');
     }
     _FavList = [];
     prefs.remove('userCount');

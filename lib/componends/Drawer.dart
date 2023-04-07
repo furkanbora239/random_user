@@ -1,6 +1,7 @@
+// ignore_for_file: camel_case_types, file_names
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:random_user/main.dart';
 
 import '../provider.dart';
 
@@ -13,8 +14,9 @@ class myDrawer extends StatefulWidget {
 
 class _myDrawerState extends State<myDrawer> {
   String dropDownSelectionGender = 'random',
-      dropDownSelectionNations = 'random',
       dropDownSelectionPassword = 'strong';
+
+  ValueNotifier<String> dropDownSelectionNations = ValueNotifier('random');
 
   @override
   Widget build(BuildContext context) {
@@ -72,24 +74,25 @@ class _myDrawerState extends State<myDrawer> {
                 width: 10,
               ),
               Expanded(
-                child: DropdownButton<String>(
-                    value: dropDownSelectionNations,
-                    items: context
-                        .read<urlChecker>()
-                        .nation
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: ((String? newValue) {
-                      setState(() {
-                        dropDownSelectionNations = newValue!;
+                child: ValueListenableBuilder(
+                  valueListenable: dropDownSelectionNations,
+                  builder: (context, value, child) => DropdownButton<String>(
+                      value: dropDownSelectionNations.value,
+                      items: context
+                          .read<urlChecker>()
+                          .nation
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: ((String? newValue) {
+                        dropDownSelectionNations.value = newValue!;
                         context.read<urlChecker>().urlUpdater[1] = newValue;
                         context.read<urlChecker>().urlUpdete();
-                      });
-                    })),
+                      })),
+                ),
               )
             ],
           ),
