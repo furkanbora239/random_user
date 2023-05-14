@@ -1,10 +1,8 @@
-// ignore_for_file: camel_case_types
+// ignore_for_file: camel_case_types, file_names
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:random_user/componends/googleLikeBox.dart';
 import 'package:random_user/main.dart';
-import 'package:random_user/model.dart';
-import 'package:random_user/service.dart';
 
 import '../provider.dart';
 
@@ -27,7 +25,7 @@ class seeUserInfoPage extends StatelessWidget {
         body: Container(
           foregroundDecoration: BoxDecoration(
               border: Border.all(color: Colors.black, width: 2),
-              borderRadius: BorderRadius.all(Radius.circular(10))),
+              borderRadius: const BorderRadius.all(Radius.circular(10))),
           margin: const EdgeInsets.all(10),
           child: ListView(children: [
             Row(
