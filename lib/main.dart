@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, camel_case_types, non_constant_identifier_names
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:random_user/componends/Drawer.dart';
@@ -10,7 +12,17 @@ import 'package:random_user/service.dart';
 
 import 'componends/googleLikeBox.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => urlChecker()),
     ChangeNotifierProvider(create: (_) => UserList())
@@ -25,7 +37,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Random User',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -53,8 +65,6 @@ class ux extends StatefulWidget {
 class _uxState extends State<ux> {
   @override
   void initState() {
-    // TODO: implement initState
-
     context.read<UserList>().checkCounter();
 
     context.read<UserList>().getFavUser();
